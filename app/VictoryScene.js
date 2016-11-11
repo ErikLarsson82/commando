@@ -1,9 +1,11 @@
 define('app/VictoryScene', [
   'Ob',
   'userInput',
+  'app/images'
 ], function (
   Ob,
-  userInput
+  userInput,
+  images
 ) {
   return {
     name: 'VictoryScene',
@@ -36,8 +38,8 @@ define('app/VictoryScene', [
 
       context.font= "30px Verdana";
       context.fillStyle="white";
-      var text = (this.win) ? "VICTORY" : "GAME OVER";
-      context.fillText(text,145,100);
+      var image = (this.win) ? images.victory : images.defeat;
+      context.drawImage(image, 0, 0);
 
     },
   }

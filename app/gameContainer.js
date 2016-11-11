@@ -43,7 +43,7 @@ requirejs([
       gameOverMusic: gameOverMusic,
     }
 
-    var muted = false;
+    var muted = !false;
     window.addEventListener("keydown", function(e) {
       if (e.keyCode === 77) { // M - mute
         muted = !muted
@@ -68,6 +68,7 @@ requirejs([
         }
       }
     }
+
     sceneManager.changeScene('GameScene', playSound)
 
     var config = {
