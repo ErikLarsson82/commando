@@ -40,6 +40,7 @@ define('app/game', [
         }
     }
 
+<<<<<<< d054802062b209e54aa136f7b86098aa9bacf179
     class Scroller extends GameObject {
         constructor(scrollAmount) {
             super({width: 0, height: 0})
@@ -57,6 +58,12 @@ define('app/game', [
         draw() {}
         getScreenOffset() {
             return this.scrollAmount;
+=======
+    class Tile extends GameObject {
+        constructor(config) {
+            super(config)
+            this.setVelocityXY(0, 0)
+>>>>>>> added tile and tile collisions
         }
     }
 
@@ -149,18 +156,22 @@ define('app/game', [
     class Enemy extends GameObject {
         constructor(config) {
             super(config)
-            this.setVelocityXY(1.5, 0)
+            this.speed = config.speed || 2
+            this.setVelocityXY(0, 0)
             this.decisionCooldown = config.decisionCooldown
             this.decisionCooldownCounter = 0
         }
         makeDecision() {
-            console.log('makeDecision')
             const player = getPlayerObject()
+            let str = 'run against'
             let nextAngle = this.position.getAngleBetween(player.position)
-            if (player.position.getDistance(this.position) < 100) {
+            if (player.position.getDistance(this.position) < 280) {
                 nextAngle += Math.PI
+                str = 'run away'
             }
+            console.log('makeDecision', str, this.position.getDistance(player.position))
             this.velocity.setAngle(nextAngle)
+            this.velocity.setMagnitude(this.speed)
         }
         tick() {
             if (this.decisionCooldownCounter <= 0) {
@@ -217,6 +228,7 @@ define('app/game', [
         },
         tick: function() {
             _.each(gameObjects, function(gameObject) {
+                gameObject.previousPosition = gameObject.position.clone()
                 gameObject.tick();
             });
 
@@ -225,6 +237,23 @@ define('app/game', [
                 gameObject.position.add(gameObject.velocity)
 
             })
+
+            function resolveGubbeVsTile(gubbe, tile) {
+                if ((gubbe.velocity.x > 0 &&
+                    gubbe.previousPosition.x + gubbe.width < tile.position.x) ||
+                    (gubbe.velocity.x < 0 &&
+                    gubbe.previousPosition.x > tile.position.x + tile.width)) {
+                    gubbe.velocity.x = 0
+                    gubbe.position = gubbe.previousPosition.clone().setY(gubbe.position.y)
+                }
+                if ((gubbe.velocity.y > 0 &&
+                    gubbe.previousPosition.y + gubbe.height < tile.position.y) ||
+                    (gubbe.velocity.y < 0 &&
+                    gubbe.previousPosition.y > tile.position.y + tile.height)) {
+                    gubbe.velocity.y = 0
+                    gubbe.position = gubbe.previousPosition.clone().setX(gubbe.position.x)
+                }
+            }
 
             Krocka.run({
                 objects: gameObjects,
@@ -236,13 +265,18 @@ define('app/game', [
                 },
                 resolver: function (collision) {
 
+                    collision.resolveByType(Player, Tile, resolveGubbeVsTile)
+                    collision.resolveByType(Enemy, Tile, resolveGubbeVsTile)
+
                   collision.resolveByType(PlayerBullet, Enemy, function (playerBullet, enemy) {
                     playerBullet.destroy();
                     enemy.destroy();
                   })
 
+                  collision
+
                 },
-              })
+            })
 
             gameObjects = _.filter(gameObjects, function(gameObject) {
                 return (!gameObject.markedForRemoval)
