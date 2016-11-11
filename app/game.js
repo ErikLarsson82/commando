@@ -126,8 +126,10 @@ define('app/game', [
             this.speed = 3;
             this.direction = { x: 0, y: 0 }
             this.recharge = 0;
+            this.player_walking = images.player_walking;
         }
         tick() {
+            this.player_walking.tick(1000/60);
             const pad = userInput.getInput(0)
 
             var velocity = {
@@ -143,6 +145,12 @@ define('app/game', [
             //Prevent player from leaving bottom edge of screen
             if (velocity.y > 0 && this.position.y > scroller.getScreenOffset() + canvas.height - this.height)
                 velocity.y = 0;
+
+            if (velocity.x !== 0 || velocity.y !== 0) {
+                this.player_walking.play();
+            } else {
+                this.player_walking.stop();
+            }
 
             this.setVelocityXY(velocity.x,velocity.y)
 
@@ -161,7 +169,14 @@ define('app/game', [
             }
         }
         draw() {
-            context.drawImage(images.player, this.position.x, this.position.y);
+            context.save()
+            context.translate(this.position.x, this.position.y);
+            if (this.direction.x <= 0) {
+                context.translate(TILE_SIZE,0)
+                context.scale(-1, 1)
+            }
+            this.player_walking.draw(context);
+            context.restore();
         }
     }
 
