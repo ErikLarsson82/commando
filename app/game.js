@@ -72,10 +72,16 @@ define('app/game', [
         constructor(config) {
             super(config)
             this.setVelocityXY(0, 0)
+            this.isDetectable = config.isDetectable
+            this.image = config.image
         }
         draw() {
-            context.drawImage(images.wall_top, this.position.x, this.position.y);
-            context.drawImage(images.wall_side, this.position.x, this.position.y + TILE_SIZE);
+            if (!this.image) {
+                context.drawImage(images.wall_top, this.position.x, this.position.y);
+                context.drawImage(images.wall_side, this.position.x, this.position.y + TILE_SIZE);
+            } else {
+                context.drawImage(this.image, this.position.x, this.position.y);
+            }
         }
     }
 
@@ -327,7 +333,8 @@ define('app/game', [
               case 2:
                 var tile = new Tile({
                     width: TILE_SIZE,
-                    height: TILE_SIZE * 2
+                    height: TILE_SIZE * 2,
+                    isDetectable: true,
                 });
                 tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
                 gameObjects.push(tile);
@@ -340,6 +347,25 @@ define('app/game', [
                 enemy.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
                 gameObjects.push(enemy);
               break;
+              case 'A':
+                var tile = new Tile({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE,
+                    isDetectable: false,
+                    image: images.stones001,
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
+                break;
+              case 'B':
+                var tile = new Tile({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE,
+                    isDetectable: false,
+                    image: images.stones002,
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
             }
           })
       })

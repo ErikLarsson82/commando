@@ -29,6 +29,12 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var bullet_hit = new Image();
   bullet_hit.src = "./assets/images/bullet_hit.png";
 
+  var stones001 = new Image();
+  stones001.src = "./assets/images/stones001.png";
+
+  var stones002 = new Image();
+  stones002.src = "./assets/images/stones002.png";
+
   return {
     player: player,
     wall_side: wall_side,
@@ -37,5 +43,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     bullet: bullet,
     enemy: enemy,
     bullet_hit: bullet_hit,
+    stones001: stones001,
+    stones002: stones002,
   }
 })
