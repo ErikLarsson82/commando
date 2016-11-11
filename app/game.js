@@ -268,10 +268,11 @@ define('app/game', [
             if (!player) return;
             if (player.position.getDistance(this.position) < 850) {
                 this.state = 'TOWARDS'
-                const nextAngle = this.position.getAngleBetween(player.position)
-                this.velocity.setAngle(nextAngle)
-                this.velocity.setMagnitude(this.speed)
-            } else if (player.position.getDistance(this.position) < 280) {
+            }
+            const nextAngle = this.position.getAngleBetween(player.position)
+            this.velocity.setAngle(nextAngle)
+            this.velocity.setMagnitude(this.speed)
+            if (player.position.getDistance(this.position) < 280) {
                 const nextAngle = this.position.getAngleBetween(player.position) + Math.PI
                 this.velocity.setAngle(nextAngle)
                 this.velocity.setMagnitude(this.speed)
