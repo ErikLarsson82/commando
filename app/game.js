@@ -28,6 +28,7 @@ define('app/game', [
     var winCondition;
     var playSound;
     var _changeScene;
+    var musicPlaying;
 
     class GameObject extends Krocka.AABB {
         constructor(config) {
@@ -74,6 +75,40 @@ define('app/game', [
             this.setVelocityXY(0, 0)
             this.isDetectable = config.isDetectable
             this.image = config.image
+        }
+        draw() {
+            if (!this.image) {
+                context.drawImage(images.wall_top, this.position.x, this.position.y);
+                context.drawImage(images.wall_side, this.position.x, this.position.y + TILE_SIZE);
+            } else {
+                context.drawImage(this.image, this.position.x, this.position.y);
+            }
+        }
+    }
+
+    class Blowable extends Tile {
+        constructor(config) {
+            super(config)
+            this.setVelocityXY(0, 0)
+            this.isDetectable = config.isDetectable
+            this.image = config.image
+        }
+        emit() {
+            _.each(new Array(30), function() {
+                var particleSettings = {
+                    width: 20,
+                    height: 20,
+                    momentum: {
+                      x: ((Math.random() - 0.5) * 20),
+                      y: ((Math.random() - 0.5) * 20),
+                    },
+                    image: images.player,
+                    lifetime: 90,
+                }
+                var particle = new Particle(particleSettings);
+                particle.setPositionXY(this.position.x + (Math.random() * TILE_SIZE / 2) + TILE_SIZE / 4, this.position.y - 4);
+                gameObjects.push(particle);
+            }.bind(this))
         }
         draw() {
             if (!this.image) {
@@ -242,6 +277,31 @@ define('app/game', [
         }
     }
 
+    class Particle extends GameObject {
+        constructor(config) {
+          super(config);
+          this.momentum = {
+            x: config.momentum.x,
+            y: config.momentum.y
+          }
+          this.setVelocityXY(0,0);
+          this.image = config.image;
+          this.lifetimeMax = config.lifetime;
+          this.lifetime = config.lifetime;
+        }
+        tick() {
+          this.setVelocityXY(this.momentum.x, this.momentum.y)
+          this.momentum.x = this.momentum.x * 0.98;
+          this.momentum.y = this.momentum.y * 0.98;
+
+          this.lifetime--;
+          if (this.lifetime <= 0) this.markedForRemoval = true;
+        }
+        draw(renderingContext) {
+          super.draw(renderingContext);
+        }
+    }
+
     class Enemy extends GameObject {
         constructor(config) {
             super(config)
@@ -350,6 +410,16 @@ define('app/game', [
                 enemy.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
                 gameObjects.push(enemy);
               break;
+              case 5:
+                var tile = new Blowable({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE * 2,
+                    image: images.player,
+                    isDetectable: true
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
+              break;
               case 'A':
                 var tile = new Tile({
                     width: TILE_SIZE,
@@ -397,16 +467,23 @@ define('app/game', [
         }).length
     }
 
+    function playMusicIfApplicable() {
+        if (!musicPlaying) {
+            playSound('gameMusic')
+            musicPlaying = true;
+        }
+    }
+
     return {
         name: 'GameScene',
         create: function(_playSound) {
+            musicPlaying = false;
             gameObjects = [];
             var _map = map.getMap();
             scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
             winCondition = new WinCondition();
             loadMap(_map);
             playSound = _playSound;
-            playSound('gameMusic')
             _changeScene = this.changeScene.bind(this);
         },
         update: function() {
@@ -461,6 +538,15 @@ define('app/game', [
                         if (!(playerBullet instanceof EnemyBullet)) {
                             playerBullet.destroy();
                             enemy.destroy();
+                        }
+                    })
+
+                    collision.resolveByType(PlayerBullet, Blowable, function (playerBullet, blowable) {
+                        if (!(playerBullet instanceof EnemyBullet)) {
+                            playerBullet.destroy();
+                            blowable.destroy();
+                            blowable.emit();
+                            playMusicIfApplicable();
                         }
                     })
 
