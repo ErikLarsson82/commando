@@ -27,6 +27,7 @@ define('app/game', [
     var scroller;
     var winCondition;
     var playSound;
+    var _changeScene;
 
     class GameObject extends Krocka.AABB {
         constructor(config) {
@@ -140,7 +141,17 @@ define('app/game', [
     }
 
     class PlayerDyingAnimation extends GameObject {
-        //this.changeScene('VictoryScene', {win: false});
+        constructor() {
+            super({width: 0, height: 0})
+            this.setVelocityXY(0,0)
+            this.duration = 130;
+        }
+        tick() {
+            this.duration--;
+            if (this.duration <= 0) {
+                _changeScene('VictoryScene', {win: false, playSound: playSound});
+            }
+        }
     }
 
     class Player extends GameObject {
@@ -217,6 +228,12 @@ define('app/game', [
             this.player_walking.draw(context);
             context.restore();
         }
+        destroy() {
+            super.destroy();
+            var dying = new PlayerDyingAnimation();
+            dying.setPositionXY(this.position.x, this.position.y);
+            gameObjects.push(dying);
+        }
     }
 
     class Enemy extends GameObject {
@@ -242,6 +259,7 @@ define('app/game', [
         }
         makeDecision() {
             const player = getPlayerObject()
+            if (!player) return;
             if (player.position.getDistance(this.position) < 850) {
                 this.state = 'TOWARDS'
                 const nextAngle = this.position.getAngleBetween(player.position)
@@ -348,6 +366,7 @@ define('app/game', [
             loadMap(_map);
             playSound = _playSound;
             playSound('gameMusic')
+            _changeScene = this.changeScene.bind(this);
         },
         update: function() {
             _.each(gameObjects, function(gameObject) {
@@ -401,7 +420,8 @@ define('app/game', [
                     })
 
                     collision.resolveByType(EnemyBullet, Player, function (enemyBullet, player) {
-                        console.log('DEATH')
+                        player.destroy();
+                        enemyBullet.destroy();
                     })
 
                     collision.resolveByType(PlayerBullet, Tile, function (playerBullet, tile) {
