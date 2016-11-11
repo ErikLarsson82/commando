@@ -44,6 +44,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var defeat = new Image();
   defeat.src = "./assets/images/defeat.png";
 
+  var explosion = new Image();
+  explosion.src = "./assets/images/explosion.png";
+
   return {
     player: player,
     wall_side: wall_side,
@@ -57,5 +60,6 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     grass001: grass001,
     victory: victory,
     defeat: defeat,
+    explosion: explosion,
   }
 })
