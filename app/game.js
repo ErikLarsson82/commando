@@ -136,10 +136,6 @@ define('app/game', [
         constructor(config) {
             super(config)
         }
-        draw() {
-            context.fillStyle = '#FFFF00'
-            context.fillRect(this.position.x, this.position.y, this.width, this.height);
-        }
     }
 
     class PlayerDyingAnimation extends GameObject {
@@ -241,19 +237,22 @@ define('app/game', [
             this.direction = {x: 0, y:0 }
             this.shotCooldown = Math.random() * 40 + 80
             this.shotCooldownCounter = this.shotCooldown
-            this.state = 'TOWARDS'
+            this.state = 'IDLE'
         }
         makeDecision() {
             const player = getPlayerObject()
-            let nextAngle = this.position.getAngleBetween(player.position)
-            this.state = 'TOWARDS'
-            if (player.position.getDistance(this.position) < 280) {
-                nextAngle += Math.PI
+            if (player.position.getDistance(this.position) < 850) {
+                this.state = 'TOWARDS'
+                const nextAngle = this.position.getAngleBetween(player.position)
+                this.velocity.setAngle(nextAngle)
+                this.velocity.setMagnitude(this.speed)
+            } else if (player.position.getDistance(this.position) < 280) {
+                const nextAngle = this.position.getAngleBetween(player.position) + Math.PI
+                this.velocity.setAngle(nextAngle)
+                this.velocity.setMagnitude(this.speed)
                 this.state = 'AWAY'
                 this.shotCooldownCounter = this.shotCooldown
             }
-            this.velocity.setAngle(nextAngle)
-            this.velocity.setMagnitude(this.speed)
             this.direction.x = this.velocity.x;
         }
         tick() {
