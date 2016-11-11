@@ -12,8 +12,9 @@ requirejs([
   'app/game',
   'GameLoop',
   'SpriteSheet',
+  'Krocka'
 ], function (game, GameLoop, SpriteSheet) {
-    
+
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
