@@ -65,12 +65,42 @@ define('app/game', [
             super(config)
             this.speed = 4;
             this.direction = config.direction;
+            this.duration = 22;
         }
         tick() {
+            this.duration--;
             this.setVelocityXY(this.direction.x * this.speed,this.direction.y * this.speed)
+            if (this.duration < 0) {
+                this.destroy();
+                var playerBulletExplosion = new PlayerBulletExplosion({
+                    width: 20,
+                    height: 20
+                });
+                playerBulletExplosion.setPositionXY(this.position.x + this.width/2 - 10, this.position.y + this.height/2 - 10);
+                playerBulletExplosion.setVelocityXY(0, 0)
+                gameObjects.push(playerBulletExplosion)
+            }
         }
         draw() {
             context.fillStyle = "red";
+            context.fillRect(this.position.x, this.position.y, this.width, this.height);
+        }
+    }
+
+    class PlayerBulletExplosion extends GameObject {
+        constructor(config) {
+            super(config)
+            this.duration = 10;
+        }
+        tick() {
+            this.duration--;
+            if (this.duration < 0) {
+                this.destroy();
+            }
+            this.setVelocityXY(0,0)
+        }
+        draw() {
+            context.fillStyle = "blue";
             context.fillRect(this.position.x, this.position.y, this.width, this.height);
         }
     }
@@ -179,12 +209,6 @@ define('app/game', [
             Krocka.run({
                 objects: gameObjects,
                 detector: function (gameObject, other) {
-                  /*var filter = [[Player, Enemy]];
-                  var ignore = _.filter(filter, function(pair) {
-                     return (gameObject instanceof pair[0] && other instanceof pair[1] ||
-                        gameObject instanceof pair[1] && other instanceof pair[0])
-                  })
-                  if (ignore.length > 1) return false;*/
                   if (!other.markedForRemoval && !gameObject.markedForRemoval) {
                     return Krocka.detectAABBtoAABB(gameObject, other)
                   }
