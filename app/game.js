@@ -59,10 +59,8 @@ define('app/game', [
     }
 
     class WinCondition {
-        tick() {
-            if (player.position.y < player.height) {
-                console.log('WIN');
-            }
+        victory() {
+            return (player.position.y + player.height < 0)
         }
     }
 
@@ -123,6 +121,14 @@ define('app/game', [
             context.fillStyle = "blue";
             context.fillRect(this.position.x, this.position.y, this.width, this.height);
         }
+    }
+
+    class EnemyBullet extends GameObject {
+
+    }
+
+    class PlayerDyingAnimation extends GameObject {
+        //this.changeScene('VictoryScene', {win: false});
     }
 
     class Player extends GameObject {
@@ -279,7 +285,7 @@ define('app/game', [
                 gameObject.tick();
             });
             scroller.tick();
-            winCondition.tick();
+            if (winCondition.victory()) this.changeScene('VictoryScene', {win: true});
 
             gameObjects.forEach(function (gameObject) {
 
@@ -331,10 +337,6 @@ define('app/game', [
             gameObjects = _.filter(gameObjects, function(gameObject) {
                 return (!gameObject.markedForRemoval)
             });
-
-            if (countEnemies() === 0) {
-                this.changeScene('VictoryScene')
-            }
         },
         draw: function() {
             context.fillStyle = "#d3cca7";
