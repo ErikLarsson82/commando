@@ -21,6 +21,7 @@ define('app/game', [
     let gameObjects = [];
     var player;
     var scroller;
+    var winCondition;
 
     class GameObject extends Krocka.AABB {
         constructor(config) {
@@ -40,12 +41,8 @@ define('app/game', [
         }
     }
 
-    class Scroller extends GameObject {
+    class Scroller {
         constructor(scrollAmount) {
-            super({width: 0, height: 0})
-            this.setVelocityXY(0,0)
-            this.setPositionXY(0,0)
-            this.isDetectable = false;
             this.scrollAmount = scrollAmount;
         }
         tick() {
@@ -54,9 +51,16 @@ define('app/game', [
                 if (this.scrollAmount < 0) this.scrollAmount = 0;
             }
         }
-        draw() {}
         getScreenOffset() {
             return this.scrollAmount;
+        }
+    }
+
+    class WinCondition {
+        tick() {
+            if (player.position.y < player.height) {
+                console.log('WIN');
+            }
         }
     }
 
@@ -64,6 +68,10 @@ define('app/game', [
         constructor(config) {
             super(config)
             this.setVelocityXY(0, 0)
+        }
+        draw() {
+            context.drawImage(images.wall_top, this.position.x, this.position.y);
+            context.drawImage(images.wall_side, this.position.x, this.position.y + TILE_SIZE);
         }
     }
 
@@ -131,6 +139,10 @@ define('app/game', [
 
             if (!(velocity.x === 0 && velocity.y === 0))
                 this.direction = velocity;
+
+            //Prevent player from leaving bottom edge of screen
+            if (velocity.y > 0 && this.position.y > scroller.getScreenOffset() + canvas.height - this.height)
+                velocity.y = 0;
 
             this.setVelocityXY(velocity.x,velocity.y)
 
@@ -200,6 +212,14 @@ define('app/game', [
                 player.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
                 gameObjects.push(player);
               break;
+              case 2:
+                var tile = new Tile({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE * 2
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
+              break;
               case 3:
                 var enemy = new Enemy({
                     width: TILE_SIZE,
@@ -223,7 +243,7 @@ define('app/game', [
         init: function() {
             var _map = map.getMap();
             scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
-            gameObjects.push(scroller);
+            winCondition = new WinCondition();
             loadMap(_map);
         },
         tick: function() {
@@ -231,6 +251,8 @@ define('app/game', [
                 gameObject.previousPosition = gameObject.position.clone()
                 gameObject.tick();
             });
+            scroller.tick();
+            winCondition.tick();
 
             gameObjects.forEach(function (gameObject) {
 

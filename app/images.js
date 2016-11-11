@@ -2,6 +2,12 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var player = new Image();
   player.src = "./assets/images/player_placeholder.png";
 
+  var wall_side = new Image();
+  wall_side.src = "./assets/images/wall_side.png";
+
+  var wall_top = new Image();
+  wall_top.src = "./assets/images/wall_top.png";
+
   /*var walk_animation_sprite = new Image();
   walk_animation_sprite.src = "./assets/images/walk_animation.png";
 
@@ -17,5 +23,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
 
   return {
     player: player,
+    wall_side: wall_side,
+    wall_top: wall_top,
   }
 })
