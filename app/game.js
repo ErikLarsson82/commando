@@ -109,18 +109,26 @@ define('app/game', [
     class PlayerBulletExplosion extends GameObject {
         constructor(config) {
             super(config)
-            this.duration = 10;
+            var parent = this;
+            this.bullet = SpriteSheet.new(images.bullet_hit, {
+                frames: [120, 120, 120],
+                x: 0,
+                y: 0,
+                width: 64,
+                height: 64,
+                autoPlay: true,
+                callback: function() { parent.destroy() }
+            });
         }
         tick() {
-            this.duration--;
-            if (this.duration < 0) {
-                this.destroy();
-            }
+            this.bullet.tick(1000/60);
             this.setVelocityXY(0,0)
         }
         draw() {
-            context.fillStyle = "blue";
-            context.fillRect(this.position.x, this.position.y, this.width, this.height);
+            context.save()
+            context.translate(this.position.x - 23, this.position.y - 32);
+            this.bullet.draw(context);
+            context.restore();
         }
     }
 

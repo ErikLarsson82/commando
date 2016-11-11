@@ -26,6 +26,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var bullet = new Image();
   bullet.src = "./assets/images/bullet.png";
 
+  var bullet_hit = new Image();
+  bullet_hit.src = "./assets/images/bullet_hit.png";
+
   return {
     player: player,
     wall_side: wall_side,
@@ -33,5 +36,6 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     player_walking: player_walking,
     bullet: bullet,
     enemy: enemy,
+    bullet_hit: bullet_hit,
   }
 })
