@@ -16,61 +16,64 @@ define('app/game', [
 
     let gameObjects = [];
 
-    class GameObject {
+    class GameObject extends Krocka.AABB {
         constructor(config) {
-            this.game = config.game;
-            this.color = config.color || "#444444";
-        }
-        tick() {}
-        draw() {}
-    }
-
-    class PhysicsObject extends Krocka.AABB {
-        constructor(config) {
-            super(config);
-            //this.game = config.game;
+            super(config.width, config.height);
+            this.markedForRemoval = false;
+            this.isDetectable = true;
         }
         tick() {
 
         }
         draw() {
-            context.fillStyle = this.color;
+            context.fillStyle = "red";
             context.fillRect(this.position.x, this.position.y, this.width, this.height);
+        }
+        destroy() {
+            this.markedForRemoval = true;
         }
     }
 
-    class Player extends PhysicsObject {
+    class Player extends GameObject {
         constructor(config) {
             super(config)
         }
         tick() {
-            this.x = this.x + 1;
+            this.setVelocityXY(1,0)
         }
         draw() {
+            //super.draw()
             context.drawImage(images.player, this.position.x, this.position.y);
         }
     }
 
-    class Enemy extends PhysicsObject {
+    class Enemy extends GameObject {
         constructor(config) {
             super(config)
         }
         tick() {
-
+            this.setVelocityXY(0,0)
         }
         draw() {
+            //super.draw()
             context.drawImage(images.player, this.position.x, this.position.y);
         }
     }
 
     return {
         init: function() {
-            var player = new Player();
+            var player = new Player({
+                width: 64,
+                height: 128
+            });
             player.setPositionXY(50, 50);
             gameObjects.push(player);
 
-            var enemy = new Enemy();
-            enemy.setPositionXY(100, 50);
+            var enemy = new Enemy({
+                width: 64,
+                height: 128
+            });
+            enemy.setPositionXY(200, 50);
             gameObjects.push(enemy);
         },
         tick: function() {
@@ -78,12 +81,16 @@ define('app/game', [
                 gameObject.tick();
             });
 
-            var physicsObjects = _.filter(gameObjects, function(gameObject) {
-                return (gameObject.x && gameObject.y && gameObject.width && gameObject.height)
+            gameObjects.forEach(function (gameObject) {
+
+                gameObject.position.add(gameObject.velocity)
+
+                // reset velocity
+                gameObject.velocity.setXY(0, 0)
             })
 
             Krocka.run({
-                objects: physicsObjects,
+                objects: gameObjects,
                 detector: function (gameObject, other) {
                   if (!other.markedForRemoval && !gameObject.markedForRemoval) {
                     return Krocka.detectAABBtoAABB(gameObject, other)
@@ -93,11 +100,15 @@ define('app/game', [
                 resolver: function (collision) {
 
                   collision.resolveByType(Player, Enemy, function (player, enemy) {
-                    console.log('collision');
+                    enemy.destroy();
                   })
 
                 },
               })
+
+            gameObjects = _.filter(gameObjects, function(gameObject) {
+                return (!gameObject.markedForRemoval)
+            });
         },
         draw: function() {
             context.fillStyle = "white";
