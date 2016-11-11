@@ -40,7 +40,6 @@ define('app/game', [
         }
     }
 
-<<<<<<< d054802062b209e54aa136f7b86098aa9bacf179
     class Scroller extends GameObject {
         constructor(scrollAmount) {
             super({width: 0, height: 0})
@@ -58,12 +57,13 @@ define('app/game', [
         draw() {}
         getScreenOffset() {
             return this.scrollAmount;
-=======
+        }
+    }
+
     class Tile extends GameObject {
         constructor(config) {
             super(config)
             this.setVelocityXY(0, 0)
->>>>>>> added tile and tile collisions
         }
     }
 
@@ -158,7 +158,7 @@ define('app/game', [
             super(config)
             this.speed = config.speed || 2
             this.setVelocityXY(0, 0)
-            this.decisionCooldown = config.decisionCooldown
+            this.decisionCooldown = config.decisionCooldown || 120
             this.decisionCooldownCounter = 0
         }
         makeDecision() {
@@ -169,7 +169,7 @@ define('app/game', [
                 nextAngle += Math.PI
                 str = 'run away'
             }
-            console.log('makeDecision', str, this.position.getDistance(player.position))
+            // console.log('makeDecision', str, this.position.getDistance(player.position))
             this.velocity.setAngle(nextAngle)
             this.velocity.setMagnitude(this.speed)
         }
