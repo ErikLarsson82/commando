@@ -6,6 +6,7 @@ define('app/game', [
     'Krocka',
     'app/map',
     'Ob',
+    'SpriteSheet'
 ], function (
     _,
     userInput,
@@ -13,7 +14,8 @@ define('app/game', [
     images,
     Krocka,
     map,
-    Ob
+    Ob,
+    SpriteSheet
 ) {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
@@ -90,8 +92,7 @@ define('app/game', [
             this.setVelocityXY(this.direction.x * this.speed,this.direction.y * this.speed)
         }
         draw() {
-            context.fillStyle = "red";
-            context.fillRect(this.position.x, this.position.y, this.width, this.height);
+            context.drawImage(images.bullet, this.position.x, this.position.y);
         }
         destroy() {
             super.destroy();
@@ -172,7 +173,23 @@ define('app/game', [
                     width: 20,
                     height: 20
                 });
-                playerBullet.setPositionXY(this.position.x + this.width/2 - 10, this.position.y + this.height/2 - 10);
+                var bulletPosition = {
+                    x: this.position.x + this.width/2 - 10,
+                    y: this.position.y + this.height/2 - 10
+                }
+                if (this.direction.x > 0) {
+                    bulletPosition.x += 40;
+                }
+                if (this.direction.x < 0) {
+                    bulletPosition.x -= 40;
+                }
+                if (this.direction.y > 0 && this.direction.x === 0) {
+                    bulletPosition.y += 40;
+                }
+                if (this.direction.y < 0 && this.direction.x === 0) {
+                    bulletPosition.y -= 80;
+                }
+                playerBullet.setPositionXY(bulletPosition.x, bulletPosition.y);
                 playerBullet.setVelocityXY(0, 0)
                 gameObjects.push(playerBullet)
             } else if (this.recharge > 0) {
@@ -198,6 +215,16 @@ define('app/game', [
             this.setVelocityXY(0, 0)
             this.decisionCooldown = config.decisionCooldown || 120
             this.decisionCooldownCounter = 0
+            this.enemy_walking = SpriteSheet.new(images.enemy, {
+                frames: [60, 60, 60],
+                x: 0,
+                y: 0,
+                width: 64,
+                height: 128,
+                restart: true,
+                autoPlay: true
+            });
+            this.direction = {x: 0, y:0 }
         }
         makeDecision() {
             const player = getPlayerObject()
@@ -207,11 +234,12 @@ define('app/game', [
                 nextAngle += Math.PI
                 str = 'run away'
             }
-            // console.log('makeDecision', str, this.position.getDistance(player.position))
             this.velocity.setAngle(nextAngle)
             this.velocity.setMagnitude(this.speed)
+            this.direction.x = this.velocity.x;
         }
         tick() {
+            this.enemy_walking.tick(1000/60);
             if (this.decisionCooldownCounter <= 0) {
                 this.decisionCooldownCounter = this.decisionCooldown
                 this.makeDecision()
@@ -220,8 +248,14 @@ define('app/game', [
             }
         }
         draw() {
-            //super.draw()
-            context.drawImage(images.player, this.position.x, this.position.y);
+            context.save()
+            context.translate(this.position.x, this.position.y);
+            if (this.direction.x <= 0) {
+                context.translate(TILE_SIZE,0)
+                context.scale(-1, 1)
+            }
+            this.enemy_walking.draw(context);
+            context.restore();
         }
     }
 

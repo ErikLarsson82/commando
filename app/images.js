@@ -20,10 +20,18 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     restart: true,
   });
 
+  var enemy = new Image();
+  enemy.src = "./assets/images/enemy.png";
+
+  var bullet = new Image();
+  bullet.src = "./assets/images/bullet.png";
+
   return {
     player: player,
     wall_side: wall_side,
     wall_top: wall_top,
-    player_walking: player_walking
+    player_walking: player_walking,
+    bullet: bullet,
+    enemy: enemy,
   }
 })
