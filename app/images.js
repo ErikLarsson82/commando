@@ -8,6 +8,12 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var wall_top = new Image();
   wall_top.src = "./assets/images/wall_top.png";
 
+  var wall_side_breakable = new Image();
+  wall_side_breakable.src = "./assets/images/wall_side_breakable.png";
+
+  var wall_top_breakable = new Image();
+  wall_top_breakable.src = "./assets/images/wall_top_breakable.png";
+
   var player_side = new Image();
   player_side.src = "./assets/images/player_side.png";
 
