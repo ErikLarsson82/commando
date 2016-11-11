@@ -1,5 +1,9 @@
 {
-  "name"    : "your-app",
-  "version" : "0.1.0",
-  "main"    : "main.js"
+  "name": "commando",
+  "version": "0.1.0",
+  "main": "index.html",
+  "dependencies": {
+    "gameloop-schwein": "^1.0.1",
+    "spritesheet-canvas": "^1.0.2"
+  }
 }

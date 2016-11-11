@@ -3,22 +3,26 @@ requirejs.config({
     baseUrl: 'lib',
     paths: {
       'app': '../app',
-      'GameLoop': './node_modules/GameLoop/GameLoop'
+      'GameLoop': '../node_modules/gameloop-schwein/GameLoop',
+      'SpriteSheet': '../node_modules/spritesheet-canvas/SpriteSheet'
     }
 });
 
 requirejs([
   'app/game',
-  'GameLoop'
-], function (game) {
-
+  'GameLoop',
+  'SpriteSheet',
+], function (game, GameLoop, SpriteSheet) {
+    
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
+    game.init();
+
     var config = {
         callback: function(delta) { game.tick(delta); game.draw(context, canvas); },
-        fpsMode: 'screenHz',
-        fps: 144,
+        fpsMode: 'fixed',
+        fps: 60,
         autoStart: true,
         createDebugKeyBoardShortcuts: true
     }

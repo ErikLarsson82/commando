@@ -7,7 +7,9 @@ define('app/game', [
     userInput,
     utils
 ) {    
-    
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
     let gameObjects = [];
 
     class GameObject {
@@ -43,7 +45,8 @@ define('app/game', [
             _.each(gameObjects, function(gameObject) {
                 gameObject.tick(delta);
             });
-
+        },
+        draw: function() {
             context.fillStyle = "white";
             context.fillRect(0,0,canvas.width, canvas.height);
             
