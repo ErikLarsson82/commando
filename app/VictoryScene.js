@@ -1,21 +1,34 @@
 define('app/VictoryScene', [
-  'Ob'
+  'Ob',
+  'userInput',
 ], function (
-  Ob
+  Ob,
+  userInput
 ) {
   return {
     name: 'VictoryScene',
     create: function (params) {
+      this.keyblocker = 100;
       this.win = params.win;
-      params.playSound('gameMusic', true);
+      this.playSound = params.playSound;
+      this.playSound('gameMusic', true, true);
       if (this.win) {
-        params.playSound('victoryMusic')
+        this.playSound('victoryMusic')
       } else {
-        params.playSound('gameOverMusic')
+        this.playSound('gameOverMusic')
       }
     },
     update: function() {
+      this.keyblocker -= 1;
+      const pad = userInput.getInput(0)
 
+      if (this.win) return;
+      if (this.keyblocker > 0) return;
+
+      if (pad.buttons[2].pressed || Math.abs(pad.axes[0]) > 0 || Math.abs(pad.axes[1]) > 0) {
+        this.playSound('gameOverMusic', true, true)
+        this.sceneManager.changeScene('GameScene', this.playSound)
+      }
     },
     draw: function(context) {
       context.fillStyle = "black";

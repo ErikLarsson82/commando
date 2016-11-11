@@ -22,7 +22,7 @@ define('app/game', [
 
     var TILE_SIZE = 64;
 
-    let gameObjects = [];
+    let gameObjects;
     var player;
     var scroller;
     var winCondition;
@@ -386,6 +386,7 @@ define('app/game', [
     return {
         name: 'GameScene',
         create: function(_playSound) {
+            gameObjects = [];
             var _map = map.getMap();
             scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
             winCondition = new WinCondition();
