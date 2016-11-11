@@ -27,15 +27,19 @@ requirejs([
     var context = canvas.getContext('2d');
 
 
-    const gameMusic = new Audio('assets/sounds/Mariohappy.ogg')
+    const gameMusic = new Audio('assets/sounds/House_song_2016_05_02.ogg')
     gameMusic.addEventListener('ended', function() {
         this.currentTime = 0;
         this.play();
     }, false);
 
-    const victoryMusic = new Audio('assets/sounds/Mariowon.ogg')
+    const victoryMusic = new Audio('assets/sounds/Lewl.ogg')
+    victoryMusic.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
 
-    const gameOverMusic = new Audio('assets/sounds/Mariosad.ogg')
+    const gameOverMusic = new Audio('assets/sounds/death.ogg')
 
     const sfxs = {
       gameMusic: gameMusic,
