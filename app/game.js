@@ -149,9 +149,26 @@ define('app/game', [
     class Enemy extends GameObject {
         constructor(config) {
             super(config)
+            this.setVelocityXY(1.5, 0)
+            this.decisionCooldown = config.decisionCooldown
+            this.decisionCooldownCounter = 0
+        }
+        makeDecision() {
+            console.log('makeDecision')
+            const player = getPlayerObject()
+            let nextAngle = this.position.getAngleBetween(player.position)
+            if (player.position.getDistance(this.position) < 100) {
+                nextAngle += Math.PI
+            }
+            this.velocity.setAngle(nextAngle)
         }
         tick() {
-            this.setVelocityXY(0,0)
+            if (this.decisionCooldownCounter <= 0) {
+                this.decisionCooldownCounter = this.decisionCooldown
+                this.makeDecision()
+            } else {
+                this.decisionCooldownCounter--
+            }
         }
         draw() {
             //super.draw()
@@ -182,6 +199,12 @@ define('app/game', [
               break;
             }
           })
+      })
+    }
+
+    function getPlayerObject() {
+        return gameObjects.find(function (gameObject) {
+            return gameObject instanceof Player
         })
     }
 
@@ -190,7 +213,6 @@ define('app/game', [
             var _map = map.getMap();
             scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
             gameObjects.push(scroller);
-
             loadMap(_map);
         },
         tick: function() {
@@ -202,8 +224,6 @@ define('app/game', [
 
                 gameObject.position.add(gameObject.velocity)
 
-                // reset velocity
-                gameObject.velocity.setXY(0, 0)
             })
 
             Krocka.run({
