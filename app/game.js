@@ -4,17 +4,23 @@ define('app/game', [
     'utils',
     'app/images',
     'Krocka',
+    'app/map',
 ], function (
     _,
     userInput,
     utils,
     images,
-    Krocka
+    Krocka,
+    map
 ) {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
+    var TILE_SIZE = 64;
+
     let gameObjects = [];
+    var player;
+    var scroller;
 
     class GameObject extends Krocka.AABB {
         constructor(config) {
@@ -31,6 +37,26 @@ define('app/game', [
         }
         destroy() {
             this.markedForRemoval = true;
+        }
+    }
+
+    class Scroller extends GameObject {
+        constructor(scrollAmount) {
+            super({width: 0, height: 0})
+            this.setVelocityXY(0,0)
+            this.setPositionXY(0,0)
+            this.isDetectable = false;
+            this.scrollAmount = scrollAmount;
+        }
+        tick() {
+            if (player.position.y < this.scrollAmount + 500) {
+                this.scrollAmount = player.position.y - 500;
+                if (this.scrollAmount < 0) this.scrollAmount = 0;
+            }
+        }
+        draw() {}
+        getScreenOffset() {
+            return this.scrollAmount;
         }
     }
 
@@ -103,21 +129,39 @@ define('app/game', [
         }
     }
 
+    function loadMap(map) {
+
+        _.each(map, function(row, rowIdx) {
+          _.each(row, function(column, colIdx) {
+            switch(column) {
+              case 1:
+                player = new Player({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE * 2
+                });
+                player.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(player);
+              break;
+              case 3:
+                var enemy = new Enemy({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE * 2
+                });
+                enemy.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(enemy);
+              break;
+            }
+          })
+        })
+    }
+
     return {
         init: function() {
-            var player = new Player({
-                width: 64,
-                height: 128
-            });
-            player.setPositionXY(50, 50);
-            gameObjects.push(player);
+            var _map = map.getMap();
+            scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
+            gameObjects.push(scroller);
 
-            var enemy = new Enemy({
-                width: 64,
-                height: 128
-            });
-            enemy.setPositionXY(200, 50);
-            gameObjects.push(enemy);
+            loadMap(_map);
         },
         tick: function() {
             _.each(gameObjects, function(gameObject) {
@@ -164,9 +208,12 @@ define('app/game', [
             context.fillStyle = "white";
             context.fillRect(0,0,canvas.width, canvas.height);
 
+            context.save();
+            context.translate(0, -scroller.getScreenOffset());
             _.each(gameObjects, function(gameObject) {
                 gameObject.draw();
             });
+            context.restore();
         }
     }
 });
