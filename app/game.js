@@ -366,6 +366,17 @@ define('app/game', [
                 });
                 tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
                 gameObjects.push(tile);
+                break;
+              case 'C':
+                var tile = new Tile({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE,
+                    isDetectable: false,
+                    image: images.grass001,
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
+                break;
             }
           })
       })
