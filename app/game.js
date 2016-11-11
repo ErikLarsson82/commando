@@ -132,8 +132,14 @@ define('app/game', [
         }
     }
 
-    class EnemyBullet extends GameObject {
-
+    class EnemyBullet extends PlayerBullet {
+        constructor(config) {
+            super(config)
+        }
+        draw() {
+            context.fillStyle = '#FFFF00'
+            context.fillRect(this.position.x, this.position.y, this.width, this.height);
+        }
     }
 
     class PlayerDyingAnimation extends GameObject {
@@ -219,9 +225,9 @@ define('app/game', [
     class Enemy extends GameObject {
         constructor(config) {
             super(config)
-            this.speed = config.speed || 2
+            this.speed = config.speed || 3
             this.setVelocityXY(0, 0)
-            this.decisionCooldown = config.decisionCooldown || 120
+            this.decisionCooldown = config.decisionCooldown || 60
             this.decisionCooldownCounter = 0
             this.enemy_walking = SpriteSheet.new(images.enemy, {
                 frames: [60, 60, 60],
@@ -233,14 +239,18 @@ define('app/game', [
                 autoPlay: true
             });
             this.direction = {x: 0, y:0 }
+            this.shotCooldown = Math.random() * 40 + 80
+            this.shotCooldownCounter = this.shotCooldown
+            this.state = 'TOWARDS'
         }
         makeDecision() {
             const player = getPlayerObject()
-            let str = 'run against'
             let nextAngle = this.position.getAngleBetween(player.position)
+            this.state = 'TOWARDS'
             if (player.position.getDistance(this.position) < 280) {
                 nextAngle += Math.PI
-                str = 'run away'
+                this.state = 'AWAY'
+                this.shotCooldownCounter = this.shotCooldown
             }
             this.velocity.setAngle(nextAngle)
             this.velocity.setMagnitude(this.speed)
@@ -253,6 +263,22 @@ define('app/game', [
                 this.makeDecision()
             } else {
                 this.decisionCooldownCounter--
+            }
+
+            if (this.state === 'TOWARDS') {
+                if (this.shotCooldownCounter <= 0) {
+                    var bullet = new EnemyBullet({
+                        direction: _.clone(this.velocity),
+                        width: 20,
+                        height: 20
+                    });
+                    bullet.setPositionXY(this.position.x + this.width/2 - 10, this.position.y + this.height/2 - 10);
+                    bullet.setVelocityXY(0, 0)
+                    gameObjects.push(bullet)
+
+                    this.shotCooldownCounter = this.shotCooldown
+                }
+                this.shotCooldownCounter--
             }
         }
         draw() {
@@ -366,8 +392,14 @@ define('app/game', [
                     collision.resolveByType(Enemy, Tile, resolveGubbeVsTile)
 
                     collision.resolveByType(PlayerBullet, Enemy, function (playerBullet, enemy) {
-                      playerBullet.destroy();
-                      enemy.destroy();
+                        if (!(playerBullet instanceof EnemyBullet)) {
+                            playerBullet.destroy();
+                            enemy.destroy();
+                        }
+                    })
+
+                    collision.resolveByType(EnemyBullet, Player, function (enemyBullet, player) {
+                        console.log('DEATH')
                     })
 
                     collision.resolveByType(PlayerBullet, Tile, function (playerBullet, tile) {
@@ -386,9 +418,18 @@ define('app/game', [
 
             context.save();
             context.translate(0, -scroller.getScreenOffset());
-            _.each(gameObjects, function(gameObject) {
+            const tiles = gameObjects.filter(function (gameObject) {
+                return gameObject instanceof Tile
+            })
+            const everythingElse = gameObjects.filter(function (gameObject) {
+                return !(gameObject instanceof Tile)
+            })
+            tiles.forEach(function(gameObject) {
                 gameObject.draw();
-            });
+            })
+            everythingElse.forEach(function(gameObject) {
+                gameObject.draw();
+            })
             context.restore();
         }
     }
