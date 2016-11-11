@@ -5,13 +5,15 @@ define('app/game', [
     'app/images',
     'Krocka',
     'app/map',
+    'Ob',
 ], function (
     _,
     userInput,
     utils,
     images,
     Krocka,
-    map
+    map,
+    Ob
 ) {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
@@ -257,14 +259,21 @@ define('app/game', [
         })
     }
 
+    function countEnemies() {
+        return gameObjects.filter(function (gameObject) {
+            return gameObject instanceof Enemy
+        }).length
+    }
+
     return {
-        init: function() {
+        name: 'GameScene',
+        create: function() {
             var _map = map.getMap();
             scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
             winCondition = new WinCondition();
             loadMap(_map);
         },
-        tick: function() {
+        update: function() {
             _.each(gameObjects, function(gameObject) {
                 gameObject.previousPosition = gameObject.position.clone()
                 gameObject.tick();
@@ -322,6 +331,10 @@ define('app/game', [
             gameObjects = _.filter(gameObjects, function(gameObject) {
                 return (!gameObject.markedForRemoval)
             });
+
+            if (countEnemies() === 0) {
+                this.changeScene('VictoryScene')
+            }
         },
         draw: function() {
             context.fillStyle = "#d3cca7";
