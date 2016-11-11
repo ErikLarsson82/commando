@@ -382,6 +382,10 @@ define('app/game', [
 
             })
 
+            gameObjects = _.sortBy(gameObjects, function(obj) {
+                return obj.position.y;
+            })
+
             function resolveGubbeVsTile(gubbe, tile) {
                 if ((gubbe.velocity.x > 0 &&
                     gubbe.previousPosition.x + gubbe.width < tile.position.x) ||
