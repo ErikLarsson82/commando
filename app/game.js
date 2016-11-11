@@ -268,6 +268,8 @@ define('app/game', [
             if (!player) return;
             if (player.position.getDistance(this.position) < 850) {
                 this.state = 'TOWARDS'
+            } else if (this.state === 'IDLE') {
+                return
             }
             const nextAngle = this.position.getAngleBetween(player.position)
             this.velocity.setAngle(nextAngle)
