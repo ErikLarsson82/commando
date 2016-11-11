@@ -84,21 +84,24 @@ define('app/game', [
         }
         tick() {
             this.duration--;
-            this.setVelocityXY(this.direction.x * this.speed,this.direction.y * this.speed)
             if (this.duration < 0) {
                 this.destroy();
-                var playerBulletExplosion = new PlayerBulletExplosion({
-                    width: 20,
-                    height: 20
-                });
-                playerBulletExplosion.setPositionXY(this.position.x + this.width/2 - 10, this.position.y + this.height/2 - 10);
-                playerBulletExplosion.setVelocityXY(0, 0)
-                gameObjects.push(playerBulletExplosion)
             }
+            this.setVelocityXY(this.direction.x * this.speed,this.direction.y * this.speed)
         }
         draw() {
             context.fillStyle = "red";
             context.fillRect(this.position.x, this.position.y, this.width, this.height);
+        }
+        destroy() {
+            super.destroy();
+            var playerBulletExplosion = new PlayerBulletExplosion({
+                width: 20,
+                height: 20
+            });
+            playerBulletExplosion.setPositionXY(this.position.x + this.width/2 - 10, this.position.y + this.height/2 - 10);
+            playerBulletExplosion.setVelocityXY(0, 0)
+            gameObjects.push(playerBulletExplosion)
         }
     }
 
@@ -305,13 +308,14 @@ define('app/game', [
                     collision.resolveByType(Player, Tile, resolveGubbeVsTile)
                     collision.resolveByType(Enemy, Tile, resolveGubbeVsTile)
 
-                  collision.resolveByType(PlayerBullet, Enemy, function (playerBullet, enemy) {
-                    playerBullet.destroy();
-                    enemy.destroy();
-                  })
+                    collision.resolveByType(PlayerBullet, Enemy, function (playerBullet, enemy) {
+                      playerBullet.destroy();
+                      enemy.destroy();
+                    })
 
-                  collision
-
+                    collision.resolveByType(PlayerBullet, Tile, function (playerBullet, tile) {
+                      playerBullet.destroy();
+                    })
                 },
             })
 
@@ -320,7 +324,7 @@ define('app/game', [
             });
         },
         draw: function() {
-            context.fillStyle = "white";
+            context.fillStyle = "#d3cca7";
             context.fillRect(0,0,canvas.width, canvas.height);
 
             context.save();
