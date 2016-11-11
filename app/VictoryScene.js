@@ -7,6 +7,12 @@ define('app/VictoryScene', [
     name: 'VictoryScene',
     create: function (params) {
       this.win = params.win;
+      params.playSound('gameMusic', true);
+      if (this.win) {
+        params.playSound('victoryMusic')
+      } else {
+        params.playSound('gameOverMusic')
+      }
     },
     update: function() {
 

@@ -26,7 +26,49 @@ requirejs([
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
-    sceneManager.changeScene('GameScene')
+
+    const gameMusic = new Audio('assets/sounds/Mariohappy.ogg')
+    gameMusic.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
+
+    const victoryMusic = new Audio('assets/sounds/Mariowon.ogg')
+
+    const gameOverMusic = new Audio('assets/sounds/Mariosad.ogg')
+
+    const sfxs = {
+      gameMusic: gameMusic,
+      victoryMusic: victoryMusic,
+      gameOverMusic: gameOverMusic,
+    }
+
+    var muted = false;
+    window.addEventListener("keydown", function(e) {
+      if (e.keyCode === 77) { // M - mute
+        muted = !muted
+        if (muted) {
+          gameMusic.pause()
+          victoryMusic.pause();
+          gameOverMusic.pause();
+        } else {
+          gameMusic.play()
+        }
+      }
+    })
+    function playSound(soundString, shouldPause, reset) {
+      if (reset) {
+        sfxs[soundString].currentTime = 0;
+      }
+      if (!muted) {
+        if (shouldPause) {
+          sfxs[soundString].pause()
+        } else {
+          sfxs[soundString].play()
+        }
+      }
+    }
+    sceneManager.changeScene('GameScene', playSound)
 
     var config = {
         callback: function(delta) {

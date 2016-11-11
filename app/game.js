@@ -26,6 +26,7 @@ define('app/game', [
     var player;
     var scroller;
     var winCondition;
+    var playSound;
 
     class GameObject extends Krocka.AABB {
         constructor(config) {
@@ -340,11 +341,13 @@ define('app/game', [
 
     return {
         name: 'GameScene',
-        create: function() {
+        create: function(_playSound) {
             var _map = map.getMap();
             scroller = new Scroller((_map.length * TILE_SIZE) - canvas.height);
             winCondition = new WinCondition();
             loadMap(_map);
+            playSound = _playSound;
+            playSound('gameMusic')
         },
         update: function() {
             _.each(gameObjects, function(gameObject) {
@@ -352,7 +355,7 @@ define('app/game', [
                 gameObject.tick();
             });
             scroller.tick();
-            if (winCondition.victory()) this.changeScene('VictoryScene', {win: true});
+            if (winCondition.victory()) this.changeScene('VictoryScene', {win: true, playSound: playSound});
 
             gameObjects.forEach(function (gameObject) {
 
