@@ -3,11 +3,13 @@ define('app/game', [
     'userInput',
     'utils',
     'app/images',
+    'Krocka',
 ], function (
     _,
     userInput,
     utils,
-    images
+    images,
+    Krocka
 ) {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
@@ -23,58 +25,79 @@ define('app/game', [
         draw() {}
     }
 
-    class PhysicsObject extends GameObject {
+    class PhysicsObject extends Krocka.AABB {
         constructor(config) {
             super(config);
-            this.hitbox = config.hitbox;
+            //this.game = config.game;
+        }
+        tick() {
+
         }
         draw() {
             context.fillStyle = this.color;
-            context.fillRect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height);
+            context.fillRect(this.position.x, this.position.y, this.width, this.height);
         }
     }
 
     class Player extends PhysicsObject {
         constructor(config) {
-
+            super(config)
         }
         tick() {
-
+            this.x = this.x + 1;
         }
         draw() {
-
+            context.drawImage(images.player, this.position.x, this.position.y);
         }
     }
 
     class Enemy extends PhysicsObject {
         constructor(config) {
-
+            super(config)
         }
         tick() {
 
         }
         draw() {
-
+            context.drawImage(images.player, this.position.x, this.position.y);
         }
     }
 
     return {
         init: function() {
-            context.font = "20px Georgia";
+            var player = new Player();
+            player.setPositionXY(50, 50);
+            gameObjects.push(player);
 
-            gameObjects.push(new GameObject({
-                hitbox: {
-                    x: 0,
-                    y: 0,
-                    width: 10,
-                    height: 10
-                }
-            }));
+            var enemy = new Enemy();
+            enemy.setPositionXY(100, 50);
+            gameObjects.push(enemy);
         },
-        tick: function(delta) {
+        tick: function() {
             _.each(gameObjects, function(gameObject) {
-                gameObject.tick(delta);
+                gameObject.tick();
             });
+
+            var physicsObjects = _.filter(gameObjects, function(gameObject) {
+                return (gameObject.x && gameObject.y && gameObject.width && gameObject.height)
+            })
+
+            Krocka.run({
+                objects: physicsObjects,
+                detector: function (gameObject, other) {
+                  if (!other.markedForRemoval && !gameObject.markedForRemoval) {
+                    return Krocka.detectAABBtoAABB(gameObject, other)
+                  }
+                  return false
+                },
+                resolver: function (collision) {
+
+                  collision.resolveByType(Player, Enemy, function (player, enemy) {
+                    console.log('collision');
+                  })
+
+                },
+              })
         },
         draw: function() {
             context.fillStyle = "white";

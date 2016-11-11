@@ -12,7 +12,6 @@ requirejs([
   'app/game',
   'GameLoop',
   'SpriteSheet',
-  'Krocka'
 ], function (game, GameLoop, SpriteSheet) {
 
     var canvas = document.getElementById('canvas');
