@@ -93,18 +93,18 @@ define('app/game', [
             this.isDetectable = config.isDetectable
         }
         emit() {
-            _.each(new Array(30), function() {
+            _.each(new Array(50), function() {
                 var particleSettings = {
                     width: 20,
                     height: 20,
                     momentum: {
-                      x: ((Math.random() - 0.5) * 15),
-                      y: ((Math.random() - 0.5) * 15),
+                      x: ((Math.random() - 0.5) * 18),
+                      y: ((Math.random() - 0.5) * 12),
                     },
                     image: images.player
                 }
                 var particle = new Particle(particleSettings);
-                particle.setPositionXY(this.position.x + (Math.random() * TILE_SIZE / 2) + TILE_SIZE / 4, this.position.y - 4);
+                particle.setPositionXY(this.position.x + (Math.random() - 0.5 * TILE_SIZE), this.position.y + 20 + ((Math.random() - 0.5) * 2.5 * TILE_SIZE));
                 gameObjects.push(particle);
             }.bind(this))
         }
@@ -289,7 +289,7 @@ define('app/game', [
 
           var parent = this;
           this.explosion = SpriteSheet.new(images.explosion, {
-                frames: [60, 60, 60, 60, 60, 60, 60, 60, 60],
+                frames: [60, 60, 60, 60, 60, 60, 80, 80, 80],
                 x: 0,
                 y: 0,
                 width: 100,
@@ -301,8 +301,8 @@ define('app/game', [
         tick() {
           this.explosion.tick(1000/60);
           this.setVelocityXY(this.momentum.x, this.momentum.y)
-          this.momentum.x = this.momentum.x * 0.98;
-          this.momentum.y = this.momentum.y * 0.98;
+          this.momentum.x = this.momentum.x * 0.95;
+          this.momentum.y = this.momentum.y * 0.95;
         }
         draw() {
           //super.draw(renderingContext);
