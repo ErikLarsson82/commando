@@ -91,7 +91,6 @@ define('app/game', [
             super(config)
             this.setVelocityXY(0, 0)
             this.isDetectable = config.isDetectable
-            this.image = config.image
         }
         emit() {
             _.each(new Array(30), function() {
@@ -111,8 +110,8 @@ define('app/game', [
         }
         draw() {
             if (!this.image) {
-                context.drawImage(images.wall_top, this.position.x, this.position.y);
-                context.drawImage(images.wall_side, this.position.x, this.position.y + TILE_SIZE);
+                context.drawImage(images.wall_top_breakable, this.position.x, this.position.y);
+                context.drawImage(images.wall_side_breakable, this.position.x, this.position.y + TILE_SIZE);
             } else {
                 context.drawImage(this.image, this.position.x, this.position.y);
             }
@@ -426,7 +425,6 @@ define('app/game', [
                 var tile = new Blowable({
                     width: TILE_SIZE,
                     height: TILE_SIZE * 2,
-                    image: images.player,
                     isDetectable: true
                 });
                 tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);

@@ -67,5 +67,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     victory: victory,
     defeat: defeat,
     explosion: explosion,
+    wall_side_breakable: wall_side_breakable,
+    wall_top_breakable: wall_top_breakable,
   }
 })
