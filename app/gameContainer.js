@@ -62,6 +62,7 @@ requirejs([
           gameMusic.pause()
           victoryMusic.pause();
           gameOverMusic.pause();
+          heartbeat.pause();
         } else {
           gameMusic.play()
         }
