@@ -99,11 +99,10 @@ define('app/game', [
                     width: 20,
                     height: 20,
                     momentum: {
-                      x: ((Math.random() - 0.5) * 20),
-                      y: ((Math.random() - 0.5) * 20),
+                      x: ((Math.random() - 0.5) * 15),
+                      y: ((Math.random() - 0.5) * 15),
                     },
-                    image: images.player,
-                    lifetime: 90,
+                    image: images.player
                 }
                 var particle = new Particle(particleSettings);
                 particle.setPositionXY(this.position.x + (Math.random() * TILE_SIZE / 2) + TILE_SIZE / 4, this.position.y - 4);
@@ -288,17 +287,30 @@ define('app/game', [
           this.image = config.image;
           this.lifetimeMax = config.lifetime;
           this.lifetime = config.lifetime;
+
+          var parent = this;
+          this.explosion = SpriteSheet.new(images.explosion, {
+                frames: [60, 60, 60, 60, 60, 60, 60, 60, 60],
+                x: 0,
+                y: 0,
+                width: 100,
+                height: 100,
+                autoPlay: true,
+                callback: function() { parent.destroy() }
+          });
         }
         tick() {
+          this.explosion.tick(1000/60);
           this.setVelocityXY(this.momentum.x, this.momentum.y)
           this.momentum.x = this.momentum.x * 0.98;
           this.momentum.y = this.momentum.y * 0.98;
-
-          this.lifetime--;
-          if (this.lifetime <= 0) this.markedForRemoval = true;
         }
-        draw(renderingContext) {
-          super.draw(renderingContext);
+        draw() {
+          //super.draw(renderingContext);
+          context.save();
+          context.translate(this.position.x, this.position.y);
+          this.explosion.draw(context);
+          context.restore();
         }
     }
 
