@@ -18,7 +18,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   player_side.src = "./assets/images/player_side.png";
 
   var player_walking = SpriteSheet.new(player_side, {
-    frames: [60, 60, 60],
+    frames: [90, 90, 90, 90, 90, 90],
     x: 0,
     y: 0,
     width: 64,

@@ -344,7 +344,7 @@ define('app/game', [
             this.decisionCooldown = config.decisionCooldown || 60
             this.decisionCooldownCounter = 0
             this.enemy_walking = SpriteSheet.new(images.enemy, {
-                frames: [60, 60, 60],
+                frames: [90, 90, 90, 90, 90, 90],
                 x: 0,
                 y: 0,
                 width: 64,
