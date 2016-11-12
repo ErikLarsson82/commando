@@ -25,14 +25,48 @@ html, body {
 .text {
     margin: 20px;
 }
+h1 {
+    color: "black";
+}
+h2 {
+    color: "black";
+}
+p {
+    color: "black";
+}
+.instructions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
 </style>
 </head>
 <body>
 <div class="container">
     <canvas id="canvas" width="1024" height="768"></canvas>
     <div class="text">
-        <h1>Game Template:</h1>
-        <p>Empty template using all our NPM-packages</p>
+        <h1>Instructions:</h1>
+        <div class="instructions">
+            <div>
+                <h2>Keyboard:</h2>
+                <p>Arrow keys - Walk</p>
+                <p>Z - Shoot</p>
+            </div>
+            <div>
+                <h2>Controller (PS4):</h2>
+                <p>D-pad - Walk</p>
+                <p>X - Jump</p>
+            </div>
+            <div>
+                <h2>Controller (Xbox):</h2>
+                <p>D-pad - Walk</p>
+                <p>A - Shoot</p>
+            </div>
+        </div>
+        <h2>Created on 2016-11-11 by:</h2>
+        <p>Erik Larsson - Design, Programming, Level Design</p>
+        <p>Fredrik Järnbröst - Design, Programming, Graphics, Music, Sound</p>
+        <p>Joel Lyberg Johansson - Design, Graphics (Characters), Music</p>
     </div>
 </div>
 </body>

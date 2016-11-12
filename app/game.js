@@ -253,7 +253,7 @@ define('app/game', [
 
             this.setVelocityXY(velocity.x,velocity.y)
 
-            if (pad.buttons[2].pressed && this.recharge === 0) {
+            if (pad.buttons[0].pressed && this.recharge === 0) {
                 this.recharge = 10;
                 var playerBullet = new PlayerBullet({
                     direction: _.clone(this.direction),
