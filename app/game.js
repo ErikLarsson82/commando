@@ -75,11 +75,13 @@ define('app/game', [
             this.setVelocityXY(0, 0)
             this.isDetectable = config.isDetectable
             this.image = config.image
+            this.top = config.top
+            this.side = config.side
         }
         draw() {
             if (!this.image) {
-                context.drawImage(images.wall_top, this.position.x, this.position.y);
-                context.drawImage(images.wall_side, this.position.x, this.position.y + TILE_SIZE);
+                context.drawImage(this.top, this.position.x, this.position.y);
+                context.drawImage(this.side, this.position.x, this.position.y + TILE_SIZE);
             } else {
                 context.drawImage(this.image, this.position.x, this.position.y);
             }
@@ -445,6 +447,30 @@ define('app/game', [
                     width: TILE_SIZE,
                     height: TILE_SIZE * 2,
                     isDetectable: true,
+                    top: images.wall_top,
+                    side: images.wall_side
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
+              break;
+              case 6:
+                var tile = new Tile({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE * 2,
+                    isDetectable: true,
+                    top: images.wall_top,
+                    side: images.wall_side_02
+                });
+                tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
+                gameObjects.push(tile);
+              break;
+              case 7:
+                var tile = new Tile({
+                    width: TILE_SIZE,
+                    height: TILE_SIZE * 2,
+                    isDetectable: true,
+                    top: images.wall_top,
+                    side: images.wall_side_03
                 });
                 tile.setPositionXY(colIdx * TILE_SIZE, rowIdx * TILE_SIZE);
                 gameObjects.push(tile);

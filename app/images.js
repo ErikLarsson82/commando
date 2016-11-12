@@ -5,6 +5,12 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var wall_side = new Image();
   wall_side.src = "./assets/images/wall_side.png";
 
+  var wall_side_03 = new Image();
+  wall_side_03.src = "./assets/images/wall_side_03.png";
+
+  var wall_side_02 = new Image();
+  wall_side_02.src = "./assets/images/wall_side_02.png";
+
   var wall_top = new Image();
   wall_top.src = "./assets/images/wall_top.png";
 
@@ -59,6 +65,8 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   return {
     player: player,
     wall_side: wall_side,
+    wall_side_02: wall_side_02,
+    wall_side_03: wall_side_03,
     wall_top: wall_top,
     player_walking: player_walking,
     bullet: bullet,
