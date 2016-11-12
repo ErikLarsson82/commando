@@ -41,10 +41,13 @@ requirejs([
 
     const gameOverMusic = new Audio('assets/sounds/death.ogg')
 
+    const heartbeat = new Audio('assets/sounds/House_song_2016_05_02_heartbeat.ogg')
+
     const sfxs = {
       gameMusic: gameMusic,
       victoryMusic: victoryMusic,
       gameOverMusic: gameOverMusic,
+      heartbeat: heartbeat,
     }
 
     var muted = false;

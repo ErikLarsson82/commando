@@ -502,6 +502,7 @@ define('app/game', [
 
     function playMusicIfApplicable() {
         if (!musicPlaying) {
+            playSound('heartbeat', true, true)
             playSound('gameMusic')
             musicPlaying = true;
         }
@@ -517,6 +518,7 @@ define('app/game', [
             winCondition = new WinCondition();
             loadMap(_map);
             playSound = _playSound;
+            playSound('heartbeat')
             _changeScene = this.changeScene.bind(this);
         },
         update: function() {
