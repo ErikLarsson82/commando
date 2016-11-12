@@ -225,6 +225,7 @@ define('app/game', [
             this.speed = 3;
             this.direction = { x: 0, y: 0 }
             this.recharge = 0;
+            this.bulletSpeed = 3;
             this.player_walking = images.player_walking;
         }
         tick() {
@@ -255,8 +256,12 @@ define('app/game', [
 
             if (pad.buttons[0].pressed && this.recharge === 0) {
                 this.recharge = 10;
+                var radian = Math.atan2(this.direction.x, this.direction.y)
                 var playerBullet = new PlayerBullet({
-                    direction: _.clone(this.direction),
+                    direction: {
+                        x: Math.sin(radian) * this.bulletSpeed,
+                        y: Math.cos(radian) * this.bulletSpeed
+                    },
                     width: 20,
                     height: 20
                 });
@@ -346,6 +351,7 @@ define('app/game', [
             this.setVelocityXY(0, 0)
             this.decisionCooldown = config.decisionCooldown || 60
             this.decisionCooldownCounter = 0
+            this.bulletSpeed = 2
             this.enemy_walking = SpriteSheet.new(images.enemy, {
                 frames: [90, 90, 90, 90, 90, 90],
                 x: 0,
@@ -391,8 +397,12 @@ define('app/game', [
 
             if (this.state === 'TOWARDS') {
                 if (this.shotCooldownCounter <= 0) {
+                    var radian = Math.atan2(this.velocity.x, this.velocity.y)
                     var bullet = new EnemyBullet({
-                        direction: _.clone(this.velocity),
+                        direction: {
+                            x: Math.sin(radian) * this.bulletSpeed,
+                            y: Math.cos(radian) * this.bulletSpeed
+                        },
                         width: 20,
                         height: 20
                     });
