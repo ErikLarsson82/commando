@@ -53,6 +53,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var explosion = new Image();
   explosion.src = "./assets/images/explosion.png";
 
+  var dying = new Image();
+  dying.src = "./assets/images/dying.png";
+
   return {
     player: player,
     wall_side: wall_side,
@@ -69,5 +72,6 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     explosion: explosion,
     wall_side_breakable: wall_side_breakable,
     wall_top_breakable: wall_top_breakable,
+    dying: dying,
   }
 })

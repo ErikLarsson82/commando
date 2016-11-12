@@ -214,6 +214,9 @@ define('app/game', [
                 _changeScene('VictoryScene', {win: false, playSound: playSound});
             }
         }
+        draw() {
+            context.drawImage(images.dying, this.position.x, this.position.y)
+        }
     }
 
     class Player extends GameObject {
