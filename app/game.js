@@ -173,9 +173,32 @@ define('app/game', [
         }
     }
 
-    class EnemyBullet extends PlayerBullet {
+    class EnemyBullet extends GameObject {
         constructor(config) {
             super(config)
+            this.speed = 1.5;
+            this.direction = config.direction;
+            this.duration = 100;
+        }
+        tick() {
+            this.duration--;
+            if (this.duration < 0) {
+                this.destroy();
+            }
+            this.setVelocityXY(this.direction.x * this.speed,this.direction.y * this.speed)
+        }
+        draw() {
+            context.drawImage(images.bullet, this.position.x, this.position.y);
+        }
+        destroy() {
+            super.destroy();
+            var playerBulletExplosion = new PlayerBulletExplosion({
+                width: 20,
+                height: 20
+            });
+            playerBulletExplosion.setPositionXY(this.position.x + this.width/2 - 10, this.position.y + this.height/2 - 10);
+            playerBulletExplosion.setVelocityXY(0, 0)
+            gameObjects.push(playerBulletExplosion)
         }
     }
 
@@ -545,19 +568,19 @@ define('app/game', [
                     collision.resolveByType(Enemy, Tile, resolveGubbeVsTile)
 
                     collision.resolveByType(PlayerBullet, Enemy, function (playerBullet, enemy) {
-                        if (!(playerBullet instanceof EnemyBullet)) {
-                            playerBullet.destroy();
-                            enemy.destroy();
-                        }
+                        playerBullet.destroy();
+                        enemy.destroy();
                     })
 
                     collision.resolveByType(PlayerBullet, Blowable, function (playerBullet, blowable) {
-                        if (!(playerBullet instanceof EnemyBullet)) {
-                            playerBullet.destroy();
-                            blowable.destroy();
-                            blowable.emit();
-                            playMusicIfApplicable();
-                        }
+                        playerBullet.destroy();
+                        blowable.destroy();
+                        blowable.emit();
+                        playMusicIfApplicable();
+                    })
+
+                    collision.resolveByType(PlayerBullet, Tile, function (playerBullet, tile) {
+                      playerBullet.destroy();
                     })
 
                     collision.resolveByType(EnemyBullet, Player, function (enemyBullet, player) {
@@ -565,8 +588,8 @@ define('app/game', [
                         enemyBullet.destroy();
                     })
 
-                    collision.resolveByType(PlayerBullet, Tile, function (playerBullet, tile) {
-                      playerBullet.destroy();
+                    collision.resolveByType(EnemyBullet, Tile, function (enemyBullet, tile) {
+                      enemyBullet.destroy();
                     })
                 },
             })
