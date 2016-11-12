@@ -103,7 +103,7 @@ define('app/game', [
                       x: ((Math.random() - 0.5) * 18),
                       y: ((Math.random() - 0.5) * 12),
                     },
-                    image: images.player
+                    image: images.explosion
                 }
                 var particle = new Particle(particleSettings);
                 particle.setPositionXY(this.position.x + (Math.random() - 0.5 * TILE_SIZE), this.position.y + 20 + ((Math.random() - 0.5) * 2.5 * TILE_SIZE));
@@ -205,10 +205,27 @@ define('app/game', [
     }
 
     class PlayerDyingAnimation extends GameObject {
-        constructor() {
+        constructor(position) {
             super({width: 0, height: 0})
+            this.position = position.clone()
             this.setVelocityXY(0,0)
             this.duration = 130;
+            _.each(new Array(5), function() {
+                var particleSettings = {
+                    width: 5,
+                    height: 5,
+                    momentum: {
+                      x: 0,
+                      y: (Math.random() * 0.13),
+                    },
+                    image: images.blood,
+                    lifetime: 120,
+                }
+                var particle = new Particle(particleSettings);
+                // particle.setPositionXY(100, 100);
+                particle.setPositionXY(this.position.x + TILE_SIZE - 14, this.position.y + 39);
+                gameObjects.push(particle);
+            }.bind(this))
         }
         tick() {
             this.duration--;
@@ -302,8 +319,7 @@ define('app/game', [
         }
         destroy() {
             super.destroy();
-            var dying = new PlayerDyingAnimation();
-            dying.setPositionXY(this.position.x, this.position.y);
+            var dying = new PlayerDyingAnimation(this.position);
             gameObjects.push(dying);
         }
     }
@@ -320,29 +336,44 @@ define('app/game', [
           this.lifetimeMax = config.lifetime;
           this.lifetime = config.lifetime;
 
-          var parent = this;
-          this.explosion = SpriteSheet.new(images.explosion, {
-                frames: [60, 60, 60, 60, 60, 60, 80, 80, 80],
-                x: 0,
-                y: 0,
-                width: 100,
-                height: 100,
-                autoPlay: true,
-                callback: function() { parent.destroy() }
-          });
+          if (this.image === images.explosion) {
+              var parent = this;
+              this.explosion = SpriteSheet.new(images.explosion, {
+                    frames: [60, 60, 60, 60, 60, 60, 80, 80, 80],
+                    x: 0,
+                    y: 0,
+                    width: 100,
+                    height: 100,
+                    autoPlay: true,
+                    callback: function() { parent.destroy() }
+              });
+          }
         }
         tick() {
-          this.explosion.tick(1000/60);
-          this.setVelocityXY(this.momentum.x, this.momentum.y)
-          this.momentum.x = this.momentum.x * 0.95;
-          this.momentum.y = this.momentum.y * 0.95;
+            if (this.explosion) {
+                this.explosion.tick(1000/60);
+                this.setVelocityXY(this.momentum.x, this.momentum.y)
+                  this.momentum.x = this.momentum.x * 0.95;
+                  this.momentum.y = this.momentum.y * 0.95;
+            } else {
+                this.setVelocityXY(this.momentum.x, this.momentum.y)
+                this.momentum.y = this.momentum.y * 1.03;
+                this.lifetime--
+                if (this.lifetime < 0) {
+                    this.destroy()
+                }
+            }
         }
         draw() {
           //super.draw(renderingContext);
-          context.save();
-          context.translate(this.position.x, this.position.y);
-          this.explosion.draw(context);
-          context.restore();
+          if (this.explosion) {
+            context.save();
+            context.translate(this.position.x, this.position.y);
+            this.explosion.draw(context);
+            context.restore();
+          } else {
+            context.drawImage(this.image, this.position.x, this.position.y);
+          }
         }
     }
 
