@@ -42,6 +42,10 @@ requirejs([
     const gameOverMusic = new Audio('assets/sounds/death.ogg')
 
     const heartbeat = new Audio('assets/sounds/House_song_2016_05_02_heartbeat.ogg')
+    heartbeat.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
 
     const sfxs = {
       gameMusic: gameMusic,
