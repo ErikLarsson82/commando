@@ -69,9 +69,12 @@ define('app/game', [
         }
     }
 
+    var idx = 0;
     class Tile extends GameObject {
         constructor(config) {
             super(config)
+            this.idx = idx;
+            idx++;
             this.setVelocityXY(0, 0)
             this.isDetectable = config.isDetectable
             this.image = config.image
@@ -310,11 +313,7 @@ define('app/game', [
         draw() {
             context.save()
             context.translate(this.position.x, this.position.y);
-            if (this.direction.x <= 0) {
-                context.translate(TILE_SIZE,0)
-                context.scale(-1, 1)
-            }
-            this.player_walking.draw(context);
+            context.drawImage(images.player, 0, 0)
             context.restore();
         }
         destroy() {
@@ -610,19 +609,22 @@ define('app/game', [
             })
 
             function resolveGubbeVsTile(gubbe, tile) {
-                if ((gubbe.velocity.x > 0 &&
-                    gubbe.previousPosition.x + gubbe.width < tile.position.x) ||
-                    (gubbe.velocity.x < 0 &&
-                    gubbe.previousPosition.x > tile.position.x + tile.width)) {
+                const condition1 = gubbe.velocity.x > 0;
+                const condition2 = gubbe.previousPosition.x + gubbe.width < tile.position.x;
+                const condition3 = gubbe.velocity.x < 0;
+                const condition4 = gubbe.previousPosition.x > tile.position.x + tile.width;
+                console.log(condition1, condition2, condition3, condition4, tile.idx)
+                if ((condition1 && condition2) || (condition3 && condition4)) {
+                    console.log('stoppar mot ' + tile.idx)
                     gubbe.velocity.x = 0
-                    gubbe.position = gubbe.previousPosition.clone().setY(gubbe.position.y)
+                    gubbe.position.x = gubbe.previousPosition.x;
                 }
                 if ((gubbe.velocity.y > 0 &&
                     gubbe.previousPosition.y + gubbe.height < tile.position.y) ||
                     (gubbe.velocity.y < 0 &&
                     gubbe.previousPosition.y > tile.position.y + tile.height)) {
                     gubbe.velocity.y = 0
-                    gubbe.position = gubbe.previousPosition.clone().setX(gubbe.position.x)
+                    gubbe.position.y = gubbe.previousPosition.y;
                 }
             }
 
